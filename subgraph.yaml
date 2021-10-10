@@ -1,0 +1,44 @@
+specVersion: 0.0.2
+description: PNS 
+repository: https://github.com/hzy1919/example-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Domain
+    network: mainnet
+    source:
+      address: "0x4A5Eb5E67Bc88aB728354CDCDC88De4BE200320B"
+      abi: Registrar
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Domain
+      abis:
+        - name: Registrar
+          file: ./abis/Registrar.abi
+      eventHandlers:
+        - event: NameRegistered(string,indexed bytes32,indexed address,uint256,uint256)
+          handler: handleNameRegistered
+      file: ./src/mapping-Registrar.ts
+  - kind: ethereum/contract
+    name: Subdomain
+    network: mainnet
+    source:
+      address: "0x901B20472988Db08F96acd1Ddcfc89E9dAfDEA7a"
+      abi: ENS
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Subdomain
+      abis:
+        - name: ENS
+          file: ./abis/ENS.abi
+      eventHandlers:
+        - event: NewSubnameOwner(indexed bytes32,string,address)
+          handler: handleNewSubnameOwner
+      file: ./src/mapping-ENS.ts

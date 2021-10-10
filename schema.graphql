@@ -1,0 +1,14 @@
+type Domain @entity {
+  id: ID!
+  name: String!
+  labelHash: Bytes!
+  owner: Bytes!
+  expires: BigInt!
+}
+
+type Subdomain @entity {
+  id: ID!
+  node: Bytes!
+  label: String!
+  owner: Bytes!
+}
