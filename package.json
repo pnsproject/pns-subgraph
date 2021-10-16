@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "repository": "https://github.com/hzy1919/pns-subgraph",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "build-contract": "solc contracts/registrar/BaseRegistrar.sol --abi -o abis --overwrite && solc contracts/registrar/BaseRegistrar.sol --bin -o bin --overwrite && solc contracts/registry/ENSRegistry.sol --abi -o abis --overwrite && solc contracts/registry/ENSRegistry.sol --bin -o bin --overwrite",
     "create": "graph create pns --node https://api.thegraph.com/deploy/",
@@ -17,10 +18,14 @@
     "@graphprotocol/graph-ts": "^0.18.0"
   },
   "dependencies": {
+    "@apollo/client": "^3.4.16",
     "@openzeppelin/contracts": "^4.3.2",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0",
+    "cross-fetch": "^3.1.4",
+    "graphql": "^15.6.1",
     "openzeppelin-solidity": "^4.3.2",
+    "react": "^17.0.2",
     "truffle": "^5.0.4",
     "truffle-contract": "^4.0.5",
     "truffle-hdwallet-provider": "^1.0.4"
