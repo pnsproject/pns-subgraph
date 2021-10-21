@@ -20,9 +20,9 @@ dataSources:
         - name: Registrar
           file: ./abis/Registrar.abi
       eventHandlers:
-        - event: NameRegistered(string,indexed bytes32,indexed address,uint256,uint256)
+        - event: NameRegistered(string,indexed uint256,indexed address,uint256,uint256)
           handler: handleNameRegistered
-      file: ./src/mapping-Registrar.ts
+      file: ./src/mapping.ts
   - kind: ethereum/contract
     name: Subdomain
     network: mainnet
@@ -41,4 +41,4 @@ dataSources:
       eventHandlers:
         - event: NewSubnameOwner(indexed bytes32,string,address)
           handler: handleNewSubnameOwner
-      file: ./src/mapping-ENS.ts
+      file: ./src/mapping.ts

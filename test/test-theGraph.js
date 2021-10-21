@@ -4,7 +4,7 @@ import pkg from '@apollo/client';
 const { ApolloClient, InMemoryCache, gql,HttpLink } = pkg;
 
 
-const theGraphURL = "http://moonbeam.pns.link:8000/subgraphs/name/pns/";
+const theGraphURL = "http://moonbeam.pns.link:8000/subgraphs/name/pns";
 
 const theGraphClient = new ApolloClient({
   link: new HttpLink({ uri: theGraphURL, fetch }),
@@ -12,10 +12,8 @@ const theGraphClient = new ApolloClient({
 });
 
 const domainsQuery = `
-  query($first: Int, $orderBy: String, $orderDirection: String) {
-    Domain(
-      first: $first, orderBy: $orderBy, orderDirection: $orderDirection
-    ) {
+  query($first: Int) {
+    domains(first: $first,where:{name:"yeliying123"}) {
       id
       name
       labelHash
@@ -28,19 +26,21 @@ const domainsQuery = `
 theGraphClient.query({
   query: gql(domainsQuery),
   variables: {
-    first: 10, orderBy: "name", orderDirection: "label"
+    first: 10
   }
 })
-.then(data => console.log("Subgraph data: ", data))
-.catch(err => { console.log("Error fetching data: ", err) });
+.then(data => 
+  console.log("Subgraph data: ", data)
+  )
+.catch(err => { 
+  console.log("Error fetching data: ", err) 
+});
 
 
 
 const subdomainQuery = `
-  query($first: Int, $orderBy: String, $orderDirection: String) {
-    Subdomain(
-      first: $first, orderBy: $orderBy, orderDirection: $orderDirection
-    ) {
+  query($first: Int) {
+    subdomains(first: $first) {
       id
       node
       label
@@ -52,9 +52,11 @@ const subdomainQuery = `
 theGraphClient.query({
   query: gql(subdomainQuery),
   variables: {
-    first: 10, orderBy: "node", orderDirection: "label"
+    first: 10
   }
 })
-.then(data => console.log("Subdomain data: ", data))
-.catch(err => { console.log("Error fetching data: ", err) });
+.then(data => 
+  console.log("Subdomain data: ", data))
+.catch(err => { 
+  console.log("Error fetching data: ", err) });
 

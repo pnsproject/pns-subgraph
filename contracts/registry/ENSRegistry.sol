@@ -1,11 +1,14 @@
 pragma solidity >=0.8.4;
 
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+
 import "./ENS.sol";
 
-contract ENSRegistry is ENS {
+contract ENSRegistry is ENS, ERC721 {
 
     struct Record {
-        address owner;
+        address owner; // todo : remove this
         address resolver;
         uint64 ttl;
     }
@@ -18,7 +21,7 @@ contract ENSRegistry is ENS {
         _;
     }
 
-    constructor() public {
+    constructor() ERC721("PNS", "PNS") public {
         records[0x0].owner = msg.sender;
     }
 
@@ -35,6 +38,7 @@ contract ENSRegistry is ENS {
     }
 
     function setOwner(bytes32 node, address owner) public virtual override authorised(node) {
+        // set nft owner instead
         records[node].owner = owner;
         emit Transfer(node, owner);
     }
@@ -55,7 +59,12 @@ contract ENSRegistry is ENS {
     function setSubnameOwner(bytes32 node, string calldata name, address owner) public virtual override authorised(node) returns(bytes32) {
         bytes32 label = keccak256(bytes(name));
         bytes32 subnode = keccak256(abi.encodePacked(node, label));
+
+        if (records[subnode].owner == address(0x0)) {
+          _mint(owner, uint256(label)); // todo : manage state correctly
+        }
         records[subnode].owner = owner;
+
         emit NewSubnameOwner(node, name, owner);
         return subnode;
     }

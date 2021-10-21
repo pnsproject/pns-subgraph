@@ -1,14 +1,15 @@
 type Domain @entity {
   id: ID!
   name: String!
-  labelHash: Bytes!
-  owner: Bytes!
+  node: BigInt!
+  owner: Bytes! # address
+  cost: BigInt! # uint256
   expires: BigInt!
 }
 
 type Subdomain @entity {
   id: ID!
-  node: Bytes!
-  label: String!
+  tokenId: BigInt!
+  name: String!
   owner: Bytes!
 }

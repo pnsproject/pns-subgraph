@@ -1,7 +1,7 @@
 pragma solidity ^0.8.4;
 
 import "../registry/ENS.sol";
-import "../../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 abstract contract Registrar is Ownable {
 

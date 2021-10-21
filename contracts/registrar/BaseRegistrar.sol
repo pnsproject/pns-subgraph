@@ -5,12 +5,15 @@ import "./SafeMath.sol";
 import "./StringUtils.sol";
 
 contract BaseRegistrar is Registrar {
+
+    address root;
     
     mapping(uint256=>uint) expiries;
 
     uint constant public MIN_REGISTRATION_DURATION = 28 days;
 
     constructor(ENS _ens, bytes32 _baseNode, uint[] memory _rentPrices) {
+        root = msg.sender;
         ens = _ens;
         baseNode = _baseNode;
         setPrices(_rentPrices);
@@ -43,10 +46,6 @@ contract BaseRegistrar is Registrar {
     function nameExpires(uint256 id) public view override returns(uint) {
         return expiries[id];
     }
-
-    // function _nameExpires(uint256 id) view returns(uint) {
-    //     return expiries[id];
-    // }
 
     // Returns true iff the specified name is available for registration.
     function available(uint256 id) public view override returns(bool) {
@@ -106,6 +105,85 @@ contract BaseRegistrar is Registrar {
         }
     }
 
+    function nameRegister(string calldata name, address owner, uint duration) external payable {
+        uint len = name.strlen();
+        require(len > 10);
+
+        bytes32 label = keccak256(bytes(name));
+        uint256 tokenId = uint256(label);
+
+        uint expires = _register(tokenId, owner, duration);
+
+        uint cost = rentPrice(name, duration);
+        require(duration >= MIN_REGISTRATION_DURATION);
+        require(msg.value >= cost);
+
+        emit NameRegistered(name, label, owner, cost, expires);
+
+        // Refund any extra payment
+        if(msg.value > cost) {
+            payable(msg.sender).transfer(msg.value - cost);
+        }
+    }
+
+    function nameRedeem(string calldata name, address owner, uint duration, bytes memory code) external payable {
+        bytes32 label = keccak256(bytes(name));
+        uint256 tokenId = uint256(label);
+        require(recoverKey(name, duration, code) == root);
+
+        uint expires = _register(tokenId, owner, duration);
+        emit NameRegistered(name, label, owner, 0, expires);
+    }
+
+    // todo: mitigate security attack
+    //
+    // function nameRedeemAny(string calldata name, address owner, uint duration, bytes32 code) external payable {
+    //     uint len = name.strlen();
+    //     require(len > 10);
+
+    //     bytes32 label = keccak256(bytes(name));
+    //     uint256 tokenId = uint256(label);
+
+    //     uint expires = _register(tokenId, owner, duration);
+    //     emit NameRegistered(name, label, owner, 0, expires);
+    // }
+
+    function splitSignature(bytes memory sig)
+        internal
+        pure
+        returns (uint8, bytes32, bytes32)
+    {
+        require(sig.length == 65);
+
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+
+        assembly {
+            // first 32 bytes, after the length prefix
+            r := mload(add(sig, 32))
+            // second 32 bytes
+            s := mload(add(sig, 64))
+            // final byte (first byte of the next 32 bytes)
+            v := byte(0, mload(add(sig, 96)))
+        }
+
+        return (v, r, s);
+    }
+
+    // todo : use hash label instead
+    function recoverKey(string memory name, uint duration, bytes memory code) public view returns (address) {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+        (v, r, s) = splitSignature(code);
+
+        bytes32 msghash = keccak256(abi.encodePacked(name, duration));
+        bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", msghash));
+
+        return ecrecover(hash, v, r, s);
+    }
+
     function withdraw() public onlyOwner {
         payable(msg.sender).transfer(address(this).balance);        
     }
@@ -141,45 +219,8 @@ contract BaseRegistrar is Registrar {
         return basePrice.mul(1e8);
     }
 
-    // commit
-
-    mapping(bytes32=>uint) public commitments;
-
-    function setCommitmentAges(uint _minCommitmentAge, uint _maxCommitmentAge) public onlyOwner {
-        minCommitmentAge = _minCommitmentAge;
-        maxCommitmentAge = _maxCommitmentAge;
-    }
-
-    function makeCommitment(string memory name, address owner, bytes32 secret) pure public returns(bytes32) {
-        bytes32 label = keccak256(bytes(name));
-        return keccak256(abi.encodePacked(label, owner, secret));
-    }
-
-    function commit(bytes32 commitment) public {
-        require(commitments[commitment] + maxCommitmentAge < block.timestamp);
-        commitments[commitment] = block.timestamp;
-    }
-
     function valid(string memory name) public pure returns(bool) {
         return name.strlen() >= 3;
-    }
-
-    function _consumeCommitment(string memory name, uint duration, bytes32 commitment) internal returns (uint256) {
-        // Require a valid commitment
-        require(commitments[commitment] + minCommitmentAge <= block.timestamp);
-
-        // If the commitment is too old, or the name is registered, stop
-        require(commitments[commitment] + maxCommitmentAge > block.timestamp);
-        bytes32 label = keccak256(bytes(name));
-        require(valid(name) && available(uint256(label)));
-
-        delete(commitments[commitment]);
-
-        uint cost = rentPrice(name, duration);
-        require(duration >= MIN_REGISTRATION_DURATION);
-        require(msg.value >= cost);
-
-        return cost;
     }
 
 }

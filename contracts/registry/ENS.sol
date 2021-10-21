@@ -1,6 +1,8 @@
 pragma solidity >=0.8.4;
 
-interface ENS {
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+
+interface ENS is IERC721Metadata {
     event NewOwner(bytes32 indexed node, bytes32 indexed label, address owner);
     event NewSubnameOwner(bytes32 indexed node, string label, address owner);
     event Transfer(bytes32 indexed node, address owner);
