@@ -1,7 +1,7 @@
 import { crypto, BigInt, ByteArray } from "@graphprotocol/graph-ts"
 
-import { NewSubnameOwner as NewSubnameOwnerEvent } from '../generated/Subdomain/ENS'
-import { NameRegistered as NameRegisteredEvent } from '../generated/Domain/Registrar'
+import { NewSubnameOwner as NewSubnameOwnerEvent } from '../generated/Subdomain/IPNS'
+import { NameRegistered as NameRegisteredEvent } from '../generated/Domain/IController'
 import { Domain , Subdomain } from '../generated/schema'
 
 
@@ -16,7 +16,7 @@ export function concat(a: ByteArray, b: ByteArray): ByteArray {
   return out
 }
 
-// event NewSubnameOwner(uint256 tokenId, string name, address owner);
+//IPNS.sol: event NewSubnameOwner(uint256 tokenId, string name, address owner);
 export function handleNewSubnameOwner(event: NewSubnameOwnerEvent): void {
   // let id = event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   let id = event.params.tokenId.toHex()
@@ -30,7 +30,7 @@ export function handleNewSubnameOwner(event: NewSubnameOwnerEvent): void {
   subdomain.save()
 }
 
-// event NameRegistered(string name, uint256 indexed node, address indexed owner, uint256 cost, uint256 expires);
+//IController.sol: event NameRegistered(string name, uint256 indexed node, address indexed owner, uint256 cost, uint256 expires);
 export function handleNameRegistered(event: NameRegisteredEvent): void {
   let id = event.params.name
   let domain = Domain.load(id)

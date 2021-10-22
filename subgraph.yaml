@@ -1,6 +1,6 @@
 specVersion: 0.0.2
-description: PNS 
-repository: https://github.com/hzy1919/example-subgraph
+description: pns-subgraph 
+repository: https://github.com/pnsproject/pns-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
@@ -9,7 +9,7 @@ dataSources:
     network: mainnet
     source:
       address: "0x4A5Eb5E67Bc88aB728354CDCDC88De4BE200320B"
-      abi: Registrar
+      abi: IController
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -17,8 +17,8 @@ dataSources:
       entities:
         - Domain
       abis:
-        - name: Registrar
-          file: ./abis/Registrar.abi
+        - name: IController
+          file: ./build/contracts/IController.json
       eventHandlers:
         - event: NameRegistered(string,indexed uint256,indexed address,uint256,uint256)
           handler: handleNameRegistered
@@ -28,7 +28,7 @@ dataSources:
     network: mainnet
     source:
       address: "0x901B20472988Db08F96acd1Ddcfc89E9dAfDEA7a"
-      abi: ENS
+      abi: IPNS
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -36,9 +36,9 @@ dataSources:
       entities:
         - Subdomain
       abis:
-        - name: ENS
-          file: ./abis/ENS.abi
+        - name: IPNS
+          file: ./build/contracts/IPNS.json
       eventHandlers:
-        - event: NewSubnameOwner(indexed bytes32,string,address)
+        - event: NewSubnameOwner(uint256,string,address)
           handler: handleNewSubnameOwner
       file: ./src/mapping.ts

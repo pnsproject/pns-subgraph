@@ -1,17 +1,16 @@
 {
   "name": "pns",
   "version": "0.1.0",
-  "repository": "https://github.com/hzy1919/pns-subgraph",
+  "repository": "https://github.com/pnsproject/pns-subgraph",
   "license": "MIT",
-  "type": "module",
   "scripts": {
     "build-contract": "solc contracts/registrar/BaseRegistrar.sol --abi -o abis --overwrite && solc contracts/registrar/BaseRegistrar.sol --bin -o bin --overwrite && solc contracts/registry/ENSRegistry.sol --abi -o abis --overwrite && solc contracts/registry/ENSRegistry.sol --bin -o bin --overwrite",
     "create": "graph create pns --node https://api.thegraph.com/deploy/",
-    "create-local": "graph create pns --node http://127.0.0.1:8020",
+    "create-local": "graph create pns --node http://127.0.0.1:8120",
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy pns --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-local": "graph deploy pns --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+    "deploy-local": "graph deploy pns --ipfs http://172.18.0.1:5101 --node http://127.0.0.1:8120"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.18.0",

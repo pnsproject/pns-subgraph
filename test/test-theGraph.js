@@ -11,22 +11,44 @@ const theGraphClient = new ApolloClient({
   cache: new InMemoryCache()
 });
 
-const domainsQuery = `
-  query($first: Int) {
-    domains(first: $first,where:{name:"yeliying123"}) {
+/*
+query($first: Int) {
+  domains(first: $first,where:{name:"yeliying123"}) {
+*/
+
+/*
+`
+    query($first: Int,$name: Bytes!) {
+        domains(first: $first,where:{name:$name}) {
       id
       name
-      labelHash
+      node
       owner
+      cost
       expires
     }
   }
 `
+*/
+
+const domainsQuery = `query($owner: Bytes!) {
+  domains(where:{owner:$owner}) {
+    id
+    name
+    node
+    owner
+    cost
+    expires
+  }
+}`
+
+
 
 theGraphClient.query({
   query: gql(domainsQuery),
   variables: {
-    first: 10
+    first: 10 ,
+    owner:"yeliying123"
   }
 })
 .then(data => 
@@ -36,23 +58,32 @@ theGraphClient.query({
   console.log("Error fetching data: ", err) 
 });
 
-
-
-const subdomainQuery = `
+/*
+`
   query($first: Int) {
     subdomains(first: $first) {
       id
-      node
-      label
+      tokenId
+      name
       owner
     }
   }
 `
+*/
+
+const subdomainQuery = `query($name: String!) {
+  subdomains(name: $name) {
+    id
+    tokenId
+    name
+    owner
+  }
+}`
 
 theGraphClient.query({
   query: gql(subdomainQuery),
   variables: {
-    first: 10
+    name: "yeliying123"
   }
 })
 .then(data => 
