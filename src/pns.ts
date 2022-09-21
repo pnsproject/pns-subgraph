@@ -31,7 +31,7 @@ export function handleTransfer(event: TransferEvent): void {
   account.save();
 
   // Update the domain owner
-  let domain = getDomain(node)!;
+  let domain = getDomain(node, event.block.timestamp);
 
   domain.owner = event.params.from.toHexString();
   saveDomain(domain);
@@ -78,7 +78,7 @@ export function handleNewSubdomain(event: NewSubdomain): void {
     ) {
       domain.name = domain.labelName + ".dot";
     } else {
-      parent = parent!;
+      parent = parent;
       let name = parent.name;
       if (name) {
         domain.name = domain.labelName + "." + name;
@@ -103,7 +103,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
     .concat(event.params.tokenId.toHexString());
 
   let node = event.params.tokenId.toHexString();
-  let domain = getDomain(node)!;
+  let domain = getDomain(node, event.block.timestamp);
   domain.resolver = id;
 
   let resolver = Resolver.load(id);

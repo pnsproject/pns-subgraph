@@ -23,10 +23,10 @@ export function setMetadataBatchHandle(call: SetMetadataBatchCall): void {
     for (let i = 0; i < tokenIds.length; i++) {
       let tokenId = tokenIds[i];
       let d = data[i];
-      let domain = getDomain(tokenId.toHexString())!;
+      let domain = getDomain(tokenId.toHexString(), call.block.timestamp);
       domain.subdomainCount = d.children.toI32();
       saveDomain(domain);
-      let origin = getDomain(d.origin.toHexString())!;
+      let origin = getDomain(d.origin.toHexString());
       saveDomain(origin);
       let registration = new Registration(tokenId.toHexString());
       registration.domain = tokenId.toHexString();
@@ -52,7 +52,10 @@ export function setMetadataBatchHandle(call: SetMetadataBatchCall): void {
 }
 
 export function handleCapacityUpdated(event: CapacityUpdatedEvent): void {
-  let domain = getDomain(event.params.tokenId.toHexString())!;
+  let domain = getDomain(
+    event.params.tokenId.toHexString(),
+    event.block.timestamp
+  );
   saveDomain(domain);
 
   let registration = Registration.load(event.params.tokenId.toHexString())!;

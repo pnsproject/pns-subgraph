@@ -22,25 +22,28 @@ export const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const BIG_INT_ZERO = BigInt.fromI32(0);
 
-function createDomain(node: string, timestamp: BigInt): Domain {
+function createDomain(
+  node: string,
+  timestamp: BigInt,
+  owner: string,
+  subdomainCount: BigInt
+): Domain {
   let domain = new Domain(node);
-  if (node == ROOT_NODE) {
-    domain = new Domain(node);
-    domain.owner = EMPTY_ADDRESS;
-    domain.isMigrated = true;
-    domain.createdAt = timestamp;
-    domain.subdomainCount = 0;
-  }
+  domain.owner = owner;
+  domain.createdAt = timestamp;
+  domain.subdomainCount = subdomainCount.toI32();
   return domain;
 }
 
 export function getDomain(
   node: string,
-  timestamp: BigInt = BIG_INT_ZERO
-): Domain | null {
+  timestamp: BigInt = BIG_INT_ZERO,
+  owner: string = EMPTY_ADDRESS,
+  subdomainCount: BigInt = BigInt.zero()
+): Domain {
   let domain = Domain.load(node);
-  if (domain === null && node == ROOT_NODE) {
-    return createDomain(node, timestamp);
+  if (domain === null) {
+    return createDomain(node, timestamp, owner, subdomainCount);
   } else {
     return domain;
   }

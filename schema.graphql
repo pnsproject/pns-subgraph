@@ -4,15 +4,14 @@ type Domain @entity {
   labelName: String                                     # The human readable label name (imported from CSV), if known
   labelhash: Bytes                                      # keccak256(labelName)
   parent: Domain                                        # The namehash (id) of the parent name
-  subdomains: [Domain!]! @derivedFrom(field: "parent")  # Can count domains from length of array
+  subdomains: [Domain!] @derivedFrom(field: "parent")  # Can count domains from length of array
   subdomainCount: Int!                                  # The number of subdomains
   resolvedAddress: Account                              # Address logged from current resolver, if any
   owner: Account!
   resolver: Resolver
   ttl: BigInt
-  isMigrated: Boolean!
   createdAt: BigInt!
-  events: [DomainEvent!]! @derivedFrom(field: "domain")
+  events: [DomainEvent!] @derivedFrom(field: "domain")
 }
 
 interface DomainEvent {
