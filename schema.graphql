@@ -1,0 +1,300 @@
+type Domain @entity {
+  id: ID!                                               # The namehash of the name
+  name: String                                          # The human readable name, if known. Unknown portions replaced with hash in square brackets (eg, foo.[1234].eth)
+  labelName: String                                     # The human readable label name (imported from CSV), if known
+  labelhash: Bytes                                      # keccak256(labelName)
+  parent: Domain                                        # The namehash (id) of the parent name
+  subdomains: [Domain!]! @derivedFrom(field: "parent")  # Can count domains from length of array
+  subdomainCount: Int!                                  # The number of subdomains
+  resolvedAddress: Account                              # Address logged from current resolver, if any
+  owner: Account!
+  resolver: Resolver
+  ttl: BigInt
+  isMigrated: Boolean!
+  createdAt: BigInt!
+  events: [DomainEvent!]! @derivedFrom(field: "domain")
+}
+
+interface DomainEvent {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+}
+
+type SetNftName implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  nftAddr: Account!
+  nftTokenId: BigInt!
+}
+
+type Set implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  keyHash: BigInt! 
+  value: String!
+}
+
+type Transfer implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  from: Account
+  to: Account!
+}
+
+type NewOwner implements DomainEvent @entity {
+  id: ID!
+  parentDomain: Domain!
+  domain: Domain!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  owner: Account!
+}
+
+type NewResolver implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  resolver: Resolver!
+}
+
+type NewTTL implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  ttl: BigInt!
+}
+
+type Account @entity {
+  id: ID!
+  domains: [Domain!]! @derivedFrom(field: "owner")
+  authorities: [AuthorisationChanged!] @derivedFrom(field: "owner")
+  authoriseds: [AuthorisationChanged!] @derivedFrom(field: "target")
+  registrations: [RegistrationEvent!] @derivedFrom(field: "registrant")
+  events: [AccountEvent!] @derivedFrom(field: "account")
+}
+
+interface AccountEvent {
+  id: ID!
+  account: Account!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+}
+
+type SetName implements AccountEvent @entity {
+  id: ID!
+  account: Account!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  tokenId: Domain!
+}
+
+type Approval implements AccountEvent @entity {
+  id: ID!
+  account: Account!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  operator: Account!
+  tokens: Domain!
+}
+
+type Registration @entity {
+  id: ID!
+  domain: Domain
+  origin: Domain
+  expiryDate: BigInt!
+  capacity: BigInt
+  labelName: String
+  events: [RegistrationEvent!]! @derivedFrom(field: "registration")
+}
+
+interface RegistrationEvent {
+  id: ID!
+  registration: Registration!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  registrant: Account!
+}
+
+type InitMetadataRecord implements RegistrationEvent @entity {
+  id: ID!
+  registration: Registration!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  registrant: Account!
+  expiryDate: BigInt!
+  capacity: BigInt!
+  origin: Domain!
+  subdomainCount: Int!     
+}
+
+type CapacityUpdated implements RegistrationEvent @entity {
+  id: ID!
+  registration: Registration!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  registrant: Account!
+  domain: Domain!
+  capacity: BigInt!
+}
+
+type NameRegistered implements RegistrationEvent @entity {
+  id: ID!
+  registration: Registration!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  registrant: Account!
+  expiryDate: BigInt!
+  cost: BigInt
+}
+
+type NameRenewed implements RegistrationEvent @entity {
+  id: ID!
+  registration: Registration!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  registrant: Account!
+  expiryDate: BigInt!
+  cost: BigInt
+}
+
+
+type PriceChanged @entity {
+  id: ID!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+
+  basePrices: [BigInt!]!
+  rentPrices: [BigInt!]!
+}
+
+type Resolver @entity {
+  id: ID!                   # Concatenation of resolver address and namehash
+  domain: Domain
+  address: Bytes!           # Address of resolver contract
+
+  addr: Account             # Current value of addr record (per events)
+  contentHash: Bytes        # Content hash, in binary format.
+  texts: [String!]          # Set of observed text record keys
+  coinTypes: [BigInt!]      # Set of observed SLIP-44 coin types
+  events: [ResolverEvent!]! @derivedFrom(field: "resolver")
+}
+
+interface ResolverEvent {
+  id: ID!                   # Concatenation of block number and log ID
+  resolver: Resolver!       # Used to derive relationships to Resolvers
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+}
+
+type AddrChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  addr: Account!
+}
+
+type MulticoinAddrChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  coinType: BigInt!
+  addr: Bytes!
+}
+
+type NameChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  name: String!
+}
+
+type AbiChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  contentType: BigInt!
+}
+
+type PubkeyChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  x: Bytes!
+  y: Bytes!
+}
+
+type TextChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  key: String!
+}
+
+type ContenthashChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  hash: Bytes!
+}
+
+type InterfaceChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  interfaceID: Bytes!
+  implementer: Bytes!
+}
+
+type AuthorisationChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  owner: Account!
+  target: Account!
+  isAuthorized: Boolean!
+}
