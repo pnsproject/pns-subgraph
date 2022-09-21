@@ -56,7 +56,11 @@ function recurseDomainDelete(domain: Domain): string | null {
     domain.owner == EMPTY_ADDRESS &&
     domain.subdomainCount == 0
   ) {
-    const parentDomain = Domain.load(domain.parent!);
+    let parentId = domain.parent;
+    if (parentId == null) {
+      parentId = "";
+    }
+    const parentDomain = Domain.load(parentId!);
     if (parentDomain != null) {
       parentDomain.subdomainCount = parentDomain.subdomainCount - 1;
       parentDomain.save();
