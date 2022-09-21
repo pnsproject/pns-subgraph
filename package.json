@@ -6,11 +6,11 @@
   "scripts": {
     "codegen": "graph codegen --output-dir src/types/",
     "setup": "yarn codegen && yarn build && yarn create-local && yarn deploy-local",
-    "create-local": "graph create graphprotocol/ens --node http://127.0.0.1:9020",
-    "deploy-local": "graph deploy graphprotocol/ens --debug --ipfs http://localhost:5001 --node http://127.0.0.1:9020/ --version-label 0.0.1",
-    "remove-local": "graph remove graphprotocol/ens --node http://127.0.0.1:9020",
+    "create-local": "graph create graphprotocol/pns --node http://127.0.0.1:9020",
+    "deploy-local": "graph deploy graphprotocol/pns --debug --ipfs http://localhost:5001 --node http://127.0.0.1:9020/ --version-label 0.0.1",
+    "remove-local": "graph remove graphprotocol/pns --node http://127.0.0.1:9020",
     "build": "graph build",
-    "watch-local": "graph deploy graphprotocol/ens --watch --debug --node http://127.0.0.1:9020/ --ipfs http://localhost:5001"
+    "watch-local": "graph deploy graphprotocol/pns --watch --debug --node http://127.0.0.1:9020/ --ipfs http://localhost:5001"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.33.1",
