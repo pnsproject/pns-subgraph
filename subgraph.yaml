@@ -58,7 +58,8 @@ dataSources:
       entities:
         - Domain
         - Account
-        - Resolver
+        - Registration
+        - PriceChanged
       abis:
         - name: Controller
           file: ./abis/Controller.json

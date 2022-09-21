@@ -53,15 +53,6 @@ type Transfer implements DomainEvent @entity {
   to: Account!
 }
 
-type NewOwner implements DomainEvent @entity {
-  id: ID!
-  parentDomain: Domain!
-  domain: Domain!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  owner: Account!
-}
 
 type NewResolver implements DomainEvent @entity {
   id: ID!
@@ -72,14 +63,6 @@ type NewResolver implements DomainEvent @entity {
   resolver: Resolver!
 }
 
-type NewTTL implements DomainEvent @entity {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  ttl: BigInt!
-}
 
 type Account @entity {
   id: ID!
@@ -211,81 +194,6 @@ interface ResolverEvent {
   blockNumber: Int!
   triggeredDate: BigInt!
   transactionID: Bytes!
-}
-
-type AddrChanged implements ResolverEvent @entity {
-  id: ID!
-  resolver: Resolver!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  addr: Account!
-}
-
-type MulticoinAddrChanged implements ResolverEvent @entity {
-  id: ID!
-  resolver: Resolver!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  coinType: BigInt!
-  addr: Bytes!
-}
-
-type NameChanged implements ResolverEvent @entity {
-  id: ID!
-  resolver: Resolver!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  name: String!
-}
-
-type AbiChanged implements ResolverEvent @entity {
-  id: ID!
-  resolver: Resolver!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  contentType: BigInt!
-}
-
-type PubkeyChanged implements ResolverEvent @entity {
-  id: ID!
-  resolver: Resolver!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  x: Bytes!
-  y: Bytes!
-}
-
-type TextChanged implements ResolverEvent @entity {
-  id: ID!
-  resolver: Resolver!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  key: String!
-}
-
-type ContenthashChanged implements ResolverEvent @entity {
-  id: ID!
-  resolver: Resolver!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  hash: Bytes!
-}
-
-type InterfaceChanged implements ResolverEvent @entity {
-  id: ID!
-  resolver: Resolver!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  interfaceID: Bytes!
-  implementer: Bytes!
 }
 
 type AuthorisationChanged implements ResolverEvent @entity {
