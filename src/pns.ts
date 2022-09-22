@@ -90,10 +90,10 @@ export function handleNewSubdomain(event: NewSubdomain): void {
       domain.labelName = event.params.name;
     }
 
-    if (parent !== null && parent.name !== null) {
+    if (parent != null && parent.name != null) {
       domain.name = domain.labelName + "." + parent.name!;
     } else {
-      domain.name = domain.labelName;
+      domain.name = domain.labelName + ".dot";
     }
   }
 
