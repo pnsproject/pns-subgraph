@@ -5,10 +5,17 @@ import {
   NameRenewed as NameRenewedEvent,
   PriceChanged as PriceChangedEvent,
 } from "./types/Controller/Controller";
-import { createCallID, createEventID, getDomain, saveDomain } from "./utils";
+import {
+  createCallID,
+  createEventID,
+  defaultDomain,
+  initRootDomain,
+  ROOT_TOKEN_ID,
+} from "./utils";
 import {
   Account,
   CapacityUpdated,
+  Domain,
   InitMetadataRecord,
   NameRegistered,
   NameRenewed,
@@ -23,11 +30,23 @@ export function setMetadataBatchHandle(call: SetMetadataBatchCall): void {
     for (let i = 0; i < tokenIds.length; i++) {
       let tokenId = tokenIds[i];
       let d = data[i];
-      let domain = getDomain(tokenId.toHexString(), call.block.timestamp);
+      let domain = Domain.load(tokenId.toHexString());
+      if (domain === null && tokenId.toHexString() === ROOT_TOKEN_ID) {
+        domain = initRootDomain();
+      }
+      if (domain === null) {
+        domain = defaultDomain(tokenId.toHexString(), call.block.timestamp);
+      }
       domain.subdomainCount = d.children.toI32();
-      saveDomain(domain);
-      let origin = getDomain(d.origin.toHexString());
-      saveDomain(origin);
+      domain.save();
+      let origin = Domain.load(d.origin.toHexString());
+      if (origin === null && d.origin.toHexString() === ROOT_TOKEN_ID) {
+        origin = initRootDomain();
+      }
+      if (origin === null) {
+        origin = defaultDomain(d.origin.toHexString(), call.block.timestamp);
+      }
+      origin.save();
       let registration = new Registration(tokenId.toHexString());
       registration.domain = tokenId.toHexString();
       registration.expiryDate = d.expire;
@@ -52,13 +71,17 @@ export function setMetadataBatchHandle(call: SetMetadataBatchCall): void {
 }
 
 export function handleCapacityUpdated(event: CapacityUpdatedEvent): void {
-  let domain = getDomain(
-    event.params.tokenId.toHexString(),
-    event.block.timestamp
-  );
-  saveDomain(domain);
+  let tokenId = event.params.tokenId.toHexString();
+  let domain = Domain.load(tokenId);
+  if (domain === null && tokenId === ROOT_TOKEN_ID) {
+    domain = initRootDomain();
+  }
+  if (domain === null) {
+    domain = defaultDomain(tokenId, event.block.timestamp);
+  }
+  domain.save();
 
-  let registration = Registration.load(event.params.tokenId.toHexString())!;
+  let registration = Registration.load(tokenId)!;
 
   registration.capacity = event.params.capacity;
   registration.save();

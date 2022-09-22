@@ -22,19 +22,32 @@ import {
   SetName,
   SetNftName,
 } from "./types/schema";
-import { createEventID, getDomain, saveDomain } from "./utils";
+import {
+  createEventID,
+  defaultDomain,
+  initRootDomain,
+  ROOT_TOKEN_ID,
+} from "./utils";
 
 export function handleTransfer(event: TransferEvent): void {
   let node = event.params.tokenId.toHexString();
 
-  let account = new Account(event.params.to.toHexString());
-  account.save();
+  let fromAccount = new Account(event.params.to.toHexString());
+  fromAccount.save();
+
+  let toAccount = new Account(event.params.to.toHexString());
+  toAccount.save();
 
   // Update the domain owner
-  let domain = getDomain(node, event.block.timestamp);
+  let domain = Domain.load(node);
+
+  if (domain === null) {
+    domain = defaultDomain(node, event.block.timestamp);
+  }
 
   domain.owner = event.params.from.toHexString();
-  saveDomain(domain);
+
+  domain.save();
 
   let domainEvent = new Transfer(createEventID(event));
   domainEvent.blockNumber = event.block.number.toI32();
@@ -48,17 +61,21 @@ export function handleTransfer(event: TransferEvent): void {
 
 export function handleNewSubdomain(event: NewSubdomain): void {
   let subnode = event.params.subtokenId.toHexString();
+  let parentNode = event.params.tokenId.toHexString();
 
   let account = new Account(event.params.to.toHexString());
   account.save();
 
-  let domain = getDomain(subnode, event.block.timestamp);
-  let parent = getDomain(event.params.tokenId.toHexString());
+  let domain = Domain.load(subnode);
 
   if (domain === null) {
-    domain = new Domain(subnode);
-    domain.createdAt = event.block.timestamp;
-    domain.subdomainCount = 0;
+    domain = defaultDomain(subnode, event.block.timestamp);
+  }
+
+  let parent = Domain.load(parentNode);
+
+  if (parentNode === ROOT_TOKEN_ID && parent === null) {
+    parent = initRootDomain();
   }
 
   if (domain.parent === null && parent !== null) {
@@ -72,17 +89,10 @@ export function handleNewSubdomain(event: NewSubdomain): void {
       domain.labelName = event.params.name;
     }
 
-    if (
-      event.params.tokenId.toHexString() ==
-      "0x0000000000000000000000000000000000000000000000000000000000000000"
-    ) {
-      domain.name = domain.labelName + ".dot";
+    if (parent !== null && parent.name !== null) {
+      domain.name = domain.labelName + "." + parent.name!;
     } else {
-      parent = parent;
-      let name = parent.name;
-      if (name) {
-        domain.name = domain.labelName + "." + name;
-      }
+      domain.name = domain.labelName;
     }
   }
 
@@ -92,7 +102,7 @@ export function handleNewSubdomain(event: NewSubdomain): void {
   domain.labelhash = Bytes.fromByteArray(
     crypto.keccak256(ByteArray.fromUTF8(event.params.name))
   );
-  saveDomain(domain);
+  domain.save();
 }
 
 // Handler for NewResolver events
@@ -103,7 +113,11 @@ export function handleNewResolver(event: NewResolverEvent): void {
     .concat(event.params.tokenId.toHexString());
 
   let node = event.params.tokenId.toHexString();
-  let domain = getDomain(node, event.block.timestamp);
+  let domain = Domain.load(node);
+  if (domain === null) {
+    domain = defaultDomain(node, event.block.timestamp);
+  }
+
   domain.resolver = id;
 
   let resolver = Resolver.load(id);
@@ -115,7 +129,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
   } else {
     domain.resolvedAddress = resolver.addr;
   }
-  saveDomain(domain);
+  domain.save();
 
   let domainEvent = new NewResolver(createEventID(event));
   domainEvent.blockNumber = event.block.number.toI32();

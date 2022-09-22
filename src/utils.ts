@@ -16,9 +16,10 @@ export function createCallID(call: ethereum.Call): string {
     .concat(call.transaction.index.toString());
 }
 
-export const ROOT_NODE =
-  "0x0000000000000000000000000000000000000000000000000000000000000000";
 export const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+export const ROOT_TOKEN_ID =
+  "0x3fce7d1364a893e213bc4212792b517ffc88f5b13b86c8ef9c8d390c3a1370ce";
 
 export const BIG_INT_ZERO = BigInt.fromI32(0);
 
@@ -35,45 +36,20 @@ function createDomain(
   return domain;
 }
 
-export function getDomain(
-  node: string,
-  timestamp: BigInt = BIG_INT_ZERO,
-  owner: string = EMPTY_ADDRESS,
-  subdomainCount: BigInt = BigInt.zero()
-): Domain {
-  let domain = Domain.load(node);
-  if (domain === null) {
-    return createDomain(node, timestamp, owner, subdomainCount);
-  } else {
-    return domain;
-  }
+export function defaultDomain(node: string, timestamp: BigInt): Domain {
+  let domain = new Domain(node);
+  domain.createdAt = timestamp;
+  domain.subdomainCount = BIG_INT_ZERO.toI32();
+  return domain;
 }
 
-function recurseDomainDelete(domain: Domain): string | null {
-  if (
-    (domain.resolver == null ||
-      domain.resolver!.split("-")[0] == EMPTY_ADDRESS) &&
-    domain.owner == EMPTY_ADDRESS &&
-    domain.subdomainCount == 0
-  ) {
-    let parentId = domain.parent;
-    if (parentId == null) {
-      parentId = "";
-    }
-    const parentDomain = Domain.load(parentId!);
-    if (parentDomain != null) {
-      parentDomain.subdomainCount = parentDomain.subdomainCount - 1;
-      parentDomain.save();
-      return recurseDomainDelete(parentDomain);
-    }
-
-    return null;
-  }
-
-  return domain.id;
-}
-
-export function saveDomain(domain: Domain): void {
-  recurseDomainDelete(domain);
-  domain.save();
+export function initRootDomain(): Domain {
+  let domain = new Domain(
+    "0x3fce7d1364a893e213bc4212792b517ffc88f5b13b86c8ef9c8d390c3a1370ce"
+  );
+  domain.owner = EMPTY_ADDRESS;
+  domain.createdAt = BIG_INT_ZERO;
+  domain.subdomainCount = BIG_INT_ZERO.toI32();
+  domain.name = "dot";
+  return domain;
 }
