@@ -76,13 +76,13 @@ export function handleNewSubdomain(event: NewSubdomain): void {
 
   if (parentNode === ROOT_TOKEN_ID && parent === null) {
     parent = initRootDomain();
+    parent.save();
   }
 
   if (domain.parent === null && parent !== null) {
     parent.subdomainCount = parent.subdomainCount + 1;
+    parent.save();
   }
-
-  parent.save();
 
   if (domain.name == null) {
     // Get label and node names
