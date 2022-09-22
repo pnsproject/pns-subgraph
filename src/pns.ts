@@ -89,6 +89,13 @@ export function handleNewSubdomain(event: NewSubdomain): void {
     parent.save();
   }
 
+  if (parentNode == ROOT_TOKEN_ID && parent != null) {
+    if (parent.name === null) {
+      parent.name = "dot";
+      parent.save();
+    }
+  }
+
   if (domain.name == null) {
     // Get label and node names
     if (domain.labelName == null) {
