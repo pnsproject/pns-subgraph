@@ -190,6 +190,7 @@ export function handleApprovalForAll(event: ApprovalForAllEvent): void {
   approvalForAll.owner = event.params.owner.toHexString();
   approvalForAll.target = event.params.operator.toHexString();
   approvalForAll.isAuthorized = event.params.approved;
+
   approvalForAll.save();
 }
 
