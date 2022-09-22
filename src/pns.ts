@@ -25,6 +25,7 @@ import {
 import {
   createEventID,
   defaultDomain,
+  EMPTY_ADDRESS,
   initRootDomain,
   ROOT_TOKEN_ID,
 } from "./utils";
@@ -69,7 +70,11 @@ export function handleNewSubdomain(event: NewSubdomain): void {
   let domain = Domain.load(subnode);
 
   if (domain === null) {
-    domain = defaultDomain(subnode, event.block.timestamp);
+    if (account.id == EMPTY_ADDRESS && subnode == ROOT_TOKEN_ID) {
+      domain = initRootDomain();
+    } else {
+      domain = defaultDomain(subnode, event.block.timestamp);
+    }
   }
 
   let parent = Domain.load(parentNode);
@@ -116,7 +121,11 @@ export function handleNewResolver(event: NewResolverEvent): void {
   let node = event.params.tokenId.toHexString();
   let domain = Domain.load(node);
   if (domain === null) {
-    domain = defaultDomain(node, event.block.timestamp);
+    if (node == ROOT_TOKEN_ID) {
+      domain = initRootDomain();
+    } else {
+      domain = defaultDomain(node, event.block.timestamp);
+    }
   }
 
   domain.resolver = id;

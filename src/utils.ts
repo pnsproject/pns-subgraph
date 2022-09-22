@@ -23,19 +23,6 @@ export const ROOT_TOKEN_ID =
 
 export const BIG_INT_ZERO = BigInt.fromI32(0);
 
-function createDomain(
-  node: string,
-  timestamp: BigInt,
-  owner: string,
-  subdomainCount: BigInt
-): Domain {
-  let domain = new Domain(node);
-  domain.owner = owner;
-  domain.createdAt = timestamp;
-  domain.subdomainCount = subdomainCount.toI32();
-  return domain;
-}
-
 export function defaultDomain(node: string, timestamp: BigInt): Domain {
   let domain = new Domain(node);
   domain.createdAt = timestamp;
