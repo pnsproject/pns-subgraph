@@ -55,7 +55,9 @@ export function setMetadataBatchHandle(call: SetMetadataBatchCall): void {
       registration.labelName = domain.labelName;
       registration.save();
 
-      let registrationEvent = new InitMetadataRecord(createCallID(call));
+      let registrationEvent = new InitMetadataRecord(
+        createCallID(call) + "-" + i.toString()
+      );
       registrationEvent.registration = registration.id;
       registrationEvent.blockNumber = call.block.number.toI32();
       registrationEvent.transactionID = call.transaction.hash;
@@ -67,6 +69,9 @@ export function setMetadataBatchHandle(call: SetMetadataBatchCall): void {
       registrationEvent.subdomainCount = d.children.toI32();
       registrationEvent.save();
     }
+  } else {
+    console.error(tokenIds.toString());
+    console.error(data.toString());
   }
 }
 
