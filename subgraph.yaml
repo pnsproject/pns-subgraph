@@ -7,6 +7,39 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
+    name: Controller
+    network: moonbeam
+    source:
+      address: '0x2dF0fC48837e69D26eFA50fD3baE86977903B697'
+      abi: Controller
+      startBlock: 895456
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/controller.ts
+      entities:
+        - Domain
+        - Account
+        - Registration
+        - PriceChanged
+        - InitMetadataRecord
+      abis:
+        - name: Controller
+          file: ./abis/Controller.json
+      callHandlers:
+        - function: setMetadataBatch(uint256[],(uint256,uint64,uint64,uint64)[])
+          handler: setMetadataBatchHandle
+      eventHandlers:
+        - event: CapacityUpdated(uint256,uint256)
+          handler: handleCapacityUpdated
+        - event: NameRegistered(address,uint256,uint256,uint256,string)
+          handler: handleNameRegistered
+        - event: NameRenewed(uint256,uint256,uint256,string)
+          handler: handleNameRenewed
+        - event: PriceChanged(uint256[],uint256[])
+          handler: handlePriceChanged
+  - kind: ethereum/contract
     name: PNS
     network: moonbeam
     source:
@@ -43,38 +76,6 @@ dataSources:
         - event: SetNftName(indexed address,indexed uint256,indexed uint256)
           handler: handleSetNftName
 
-  - kind: ethereum/contract
-    name: Controller
-    network: moonbeam
-    source:
-      address: '0x2dF0fC48837e69D26eFA50fD3baE86977903B697'
-      abi: Controller
-      startBlock: 1316690
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      file: ./src/controller.ts
-      entities:
-        - Domain
-        - Account
-        - Registration
-        - PriceChanged
-        - InitMetadataRecord
-      abis:
-        - name: Controller
-          file: ./abis/Controller.json
-      callHandlers:
-        - function: setMetadataBatch(uint256[],(uint256,uint64,uint64,uint64)[])
-          handler: setMetadataBatchHandle
-      eventHandlers:
-        - event: CapacityUpdated(uint256,uint256)
-          handler: handleCapacityUpdated
-        - event: NameRegistered(address,uint256,uint256,uint256,string)
-          handler: handleNameRegistered
-        - event: NameRenewed(uint256,uint256,uint256,string)
-          handler: handleNameRenewed
-        - event: PriceChanged(uint256[],uint256[])
-          handler: handlePriceChanged
+
 
 
