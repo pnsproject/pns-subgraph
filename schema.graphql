@@ -51,6 +51,16 @@ type Transfer implements DomainEvent @entity {
   to: Account!
 }
 
+type NewSubdomain implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  triggeredDate: BigInt!
+  transactionID: Bytes!
+  to: Account!
+  parentId: Domain!
+  name: String!
+}
 
 type NewResolver implements DomainEvent @entity {
   id: ID!

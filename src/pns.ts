@@ -8,11 +8,12 @@ import {
   Set as SetEvent,
   SetName as SetNameEvent,
   SetNftName as SetNftNameEvent,
-  NewSubdomain,
+  NewSubdomain as NewSubdomainEvent,
 } from "./types/PNS/PNS";
 import {
   Account,
   Transfer,
+  NewSubdomain,
   Approval,
   AuthorisationChanged,
   Resolver,
@@ -60,7 +61,7 @@ export function handleTransfer(event: TransferEvent): void {
   domainEvent.save();
 }
 
-export function handleNewSubdomain(event: NewSubdomain): void {
+export function handleNewSubdomain(event: NewSubdomainEvent): void {
   let subnode = event.params.subtokenId.toHexString();
   let parentNode = event.params.tokenId.toHexString();
 
@@ -116,6 +117,16 @@ export function handleNewSubdomain(event: NewSubdomain): void {
     crypto.keccak256(ByteArray.fromUTF8(event.params.name))
   );
   domain.save();
+
+  let domainEvent = new NewSubdomain(createEventID(event));
+  domainEvent.blockNumber = event.block.number.toI32();
+  domainEvent.transactionID = event.transaction.hash;
+  domainEvent.triggeredDate = event.block.timestamp;
+  domainEvent.domain = subnode;
+  domainEvent.parentId = parentNode;
+  domainEvent.to = event.params.to.toHexString();
+  domainEvent.name = event.params.name;
+  domainEvent.save();
 }
 
 // Handler for NewResolver events
