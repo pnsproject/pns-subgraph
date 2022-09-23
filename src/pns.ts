@@ -9,7 +9,7 @@ import {
   SetName as SetNameEvent,
   SetNftName as SetNftNameEvent,
   NewSubdomain as NewSubdomainEvent,
-} from "./types/PNS/PNS";
+} from "./types/PNS4-26/PNS";
 import {
   Account,
   Transfer,

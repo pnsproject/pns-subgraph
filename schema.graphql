@@ -127,19 +127,6 @@ interface RegistrationEvent {
   registrant: Account!
 }
 
-type InitMetadataRecord implements RegistrationEvent @entity {
-  id: ID!
-  registration: Registration!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  registrant: Account!
-  expiryDate: BigInt!
-  capacity: BigInt!
-  origin: Domain!
-  subdomainCount: Int!     
-}
-
 type CapacityUpdated implements RegistrationEvent @entity {
   id: ID!
   registration: Registration!
