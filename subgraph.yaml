@@ -27,9 +27,9 @@ dataSources:
       abis:
         - name: Controller
           file: ./abis/Controller.json
-      callHandlers:
-        - function: setMetadataBatch(uint256[],(uint256,uint64,uint64,uint64)[])
-          handler: setMetadataBatchHandle
+      # callHandlers:
+      #   - function: setMetadataBatch(uint256[],(uint256,uint64,uint64,uint64)[])
+      #     handler: setMetadataBatchHandle
       eventHandlers:
         - event: CapacityUpdated(uint256,uint256)
           handler: handleCapacityUpdated
