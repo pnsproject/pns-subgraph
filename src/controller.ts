@@ -22,6 +22,7 @@ import {
   PriceChanged,
   Registration,
 } from "./types/schema";
+import { log } from "@graphprotocol/graph-ts";
 
 export function setMetadataBatchHandle(call: SetMetadataBatchCall): void {
   let tokenIds = call.inputs.tokenIds;
@@ -70,8 +71,12 @@ export function setMetadataBatchHandle(call: SetMetadataBatchCall): void {
       registrationEvent.save();
     }
   } else {
-    console.error(tokenIds.toString());
-    console.error(data.toString());
+    log.warning("set matadata failed: {} {} data len: {} tokenIds len: {}", [
+      data.toString(),
+      tokenIds.toString(),
+      data.length.toString(),
+      tokenIds.length.toString(),
+    ]);
   }
 }
 
