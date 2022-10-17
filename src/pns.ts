@@ -10,6 +10,7 @@ import {
   SetNftName as SetNftNameEvent,
   NewSubdomain as NewSubdomainEvent,
 } from "./types/PNS4-26/PNS";
+import { SetLink as SetLinkEvent } from "./types/PNS10-16/PNS";
 import {
   Account,
   Transfer,
@@ -22,6 +23,7 @@ import {
   Set,
   SetName,
   SetNftName,
+  SetLink,
 } from "./types/schema";
 import {
   createEventID,
@@ -242,5 +244,18 @@ export function handleSetNftName(event: SetNftNameEvent): void {
   setEvent.domain = node;
   setEvent.nftAddr = event.params.nftAddr.toHexString();
   setEvent.nftTokenId = event.params.nftTokenId;
+  setEvent.save();
+}
+
+export function handleSetLink(event: SetLinkEvent): void {
+  let node = event.params.tokenId.toHexString();
+
+  let setEvent = new SetLink(createEventID(event));
+  setEvent.blockNumber = event.block.number.toI32();
+  setEvent.transactionID = event.transaction.hash;
+  setEvent.triggeredDate = event.block.timestamp;
+  setEvent.domain = node;
+  setEvent.keyHash = event.params.keyHash;
+  setEvent.value = event.params.value;
   setEvent.save();
 }

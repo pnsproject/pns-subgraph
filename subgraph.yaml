@@ -7,6 +7,57 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
+    name: Controller10-16
+    network: moonbeam
+    source:
+      address: '0x8113e4070297b22D943241054a9dbDC395Bc6eaa'
+      abi: Controller
+      startBlock: 2090608
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/controller.ts
+      entities:
+        - Domain
+        - Account
+        - Registration
+        - PriceChanged
+      abis:
+        - name: Controller
+          file: ./abis/Controller10-16.json
+      eventHandlers:
+        - event: CapacityUpdated(uint256,uint256)
+          handler: handleCapacityUpdated
+        - event: NameRegistered(address,uint256,uint256,uint256,string)
+          handler: handleNameRegistered
+        - event: NameRenewed(uint256,uint256,uint256,string)
+          handler: handleNameRenewed
+        - event: PriceChanged(uint256[],uint256[])
+          handler: handlePriceChanged
+  - kind: ethereum/contract
+    name: PNS10-16
+    network: moonbeam
+    source:
+      address: '0x7d5F0398549C9fDEa03BbDde388361827cb376D5'
+      abi: PNS
+      startBlock: 2084699
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/pns.ts
+      entities:
+        - Domain
+        - Account
+        - Resolver
+      abis:
+        - name: PNS
+          file: ./abis/PNS10-16.json
+      eventHandlers:
+        - event: SetLink(indexed uint256,indexed uint256,indexed uint256)
+          handler: handleSetLink
+  - kind: ethereum/contract
     name: Controller6-20
     network: moonbeam
     source:
