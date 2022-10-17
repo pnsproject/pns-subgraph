@@ -1,12 +1,10 @@
 import {
-  SetMetadataBatchCall,
   CapacityUpdated as CapacityUpdatedEvent,
   NameRegistered as NameRegisteredEvent,
   NameRenewed as NameRenewedEvent,
   PriceChanged as PriceChangedEvent,
-} from "./types/Controller/Controller";
+} from "./types/Controller6-20/Controller";
 import {
-  createCallID,
   createEventID,
   defaultDomain,
   initRootDomain,
@@ -16,69 +14,12 @@ import {
   Account,
   CapacityUpdated,
   Domain,
-  InitMetadataRecord,
   NameRegistered,
   NameRenewed,
   PriceChanged,
   Registration,
 } from "./types/schema";
 import { log } from "@graphprotocol/graph-ts";
-
-export function setMetadataBatchHandle(call: SetMetadataBatchCall): void {
-  let tokenIds = call.inputs.tokenIds;
-  let data = call.inputs.data;
-  if (tokenIds.length == data.length) {
-    for (let i = 0; i < tokenIds.length; i++) {
-      let tokenId = tokenIds[i];
-      let d = data[i];
-      let domain = Domain.load(tokenId.toHexString());
-      if (domain === null && tokenId.toHexString() === ROOT_TOKEN_ID) {
-        domain = initRootDomain();
-      }
-      if (domain === null) {
-        domain = defaultDomain(tokenId.toHexString(), call.block.timestamp);
-      }
-      domain.subdomainCount = d.children.toI32();
-      domain.save();
-      let origin = Domain.load(d.origin.toHexString());
-      if (origin === null && d.origin.toHexString() === ROOT_TOKEN_ID) {
-        origin = initRootDomain();
-      }
-      if (origin === null) {
-        origin = defaultDomain(d.origin.toHexString(), call.block.timestamp);
-      }
-      origin.save();
-      let registration = new Registration(tokenId.toHexString());
-      registration.domain = tokenId.toHexString();
-      registration.expiryDate = d.expire;
-      registration.capacity = d.capacity;
-      registration.origin = d.origin.toHexString();
-      registration.labelName = domain.labelName;
-      registration.save();
-
-      let registrationEvent = new InitMetadataRecord(
-        createCallID(call) + "-" + i.toString()
-      );
-      registrationEvent.registration = registration.id;
-      registrationEvent.blockNumber = call.block.number.toI32();
-      registrationEvent.transactionID = call.transaction.hash;
-      registrationEvent.triggeredDate = call.block.timestamp;
-      registrationEvent.registrant = call.from.toHexString();
-      registrationEvent.expiryDate = d.expire;
-      registrationEvent.capacity = d.capacity;
-      registrationEvent.origin = d.origin.toHexString();
-      registrationEvent.subdomainCount = d.children.toI32();
-      registrationEvent.save();
-    }
-  } else {
-    log.warning("set matadata failed: {} {} data len: {} tokenIds len: {}", [
-      data.toString(),
-      tokenIds.toString(),
-      data.length.toString(),
-      tokenIds.length.toString(),
-    ]);
-  }
-}
 
 export function handleCapacityUpdated(event: CapacityUpdatedEvent): void {
   let tokenId = event.params.tokenId.toHexString();

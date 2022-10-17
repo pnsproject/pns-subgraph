@@ -1,5 +1,5 @@
 // Import types and APIs from graph-ts
-import { BigInt, ByteArray, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Domain } from "./types/schema";
 
 export function createEventID(event: ethereum.Event): string {
@@ -7,13 +7,6 @@ export function createEventID(event: ethereum.Event): string {
     .toString()
     .concat("-")
     .concat(event.logIndex.toString());
-}
-
-export function createCallID(call: ethereum.Call): string {
-  return call.block.number
-    .toString()
-    .concat("-")
-    .concat(call.transaction.index.toString());
 }
 
 export const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
