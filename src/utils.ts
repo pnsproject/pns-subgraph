@@ -5,6 +5,7 @@ import {
   Bytes,
   ethereum,
   // crypto,
+  log,
 } from "@graphprotocol/graph-ts";
 import { Domain } from "./types/schema";
 
@@ -46,6 +47,7 @@ export function fetchTokenId(token: BigInt): Bytes {
   let zeros = 66 - token.length;
   if (zeros != 0) {
     hex.replace("0x", "0x" + "0".repeat(zeros));
+    log.debug("fetchTokenId", [hex]);
   }
   return Bytes.fromHexString(hex);
 }
