@@ -44,7 +44,7 @@ export function initRootDomain(): Domain {
 
 export function fetchTokenId(token: BigInt): Bytes {
   let hex = token.toHex();
-  let zeros = 66 - token.length;
+  let zeros = 66 - hex.length;
   if (zeros != 0) {
     return Bytes.fromHexString("0x" + "0".repeat(zeros) + hex.slice(2));
   }
