@@ -42,12 +42,12 @@ export function initRootDomain(): Domain {
 }
 
 export function fetchTokenId(token: BigInt): Bytes {
-  return toBytes(token);
+  return Bytes.fromUint8Array(token);
 }
 
-function toBytes(value: BigInt): Bytes {
-  return (value as Uint8Array) as Bytes;
-}
+// function toBytes(value: BigInt): Bytes {
+//   return (value as Uint8Array) as Bytes;
+// }
 
 // export function getNamehash(name: string): Bytes {
 //   let node = ByteArray.fromHexString(
