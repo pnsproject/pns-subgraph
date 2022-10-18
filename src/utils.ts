@@ -1,5 +1,11 @@
 // Import types and APIs from graph-ts
-import { BigInt, ByteArray, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  // ByteArray,
+  Bytes,
+  ethereum,
+  // crypto,
+} from "@graphprotocol/graph-ts";
 import { Domain } from "./types/schema";
 
 export function createEventID(event: ethereum.Event): string {
@@ -36,5 +42,26 @@ export function initRootDomain(): Domain {
 }
 
 export function fetchTokenId(token: BigInt): Bytes {
-  return Bytes.fromHexString(token.toHex());
+  return toBytes(token);
 }
+
+function toBytes(value: BigInt): Bytes {
+  return (value as Uint8Array) as Bytes;
+}
+
+// export function getNamehash(name: string): Bytes {
+//   let node = ByteArray.fromHexString(
+//     "0000000000000000000000000000000000000000000000000000000000000000"
+//   );
+
+//   if (name) {
+//     let labels = name.split(".");
+
+//     for (let i = labels.length - 1; i >= 0; i--) {
+//       let labelSha = crypto.keccak256(ByteArray.fromUTF8(labels[i]));
+//       node = crypto.keccak256(node.concat(labelSha));
+//     }
+//   }
+
+//   return Bytes.fromByteArray(node);
+// }
