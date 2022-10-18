@@ -7,6 +7,7 @@ import {
   // crypto,
 } from "@graphprotocol/graph-ts";
 import { Domain } from "./types/schema";
+import { integer } from "@protofire/subgraph-toolkit/lib/utils";
 
 export function createEventID(event: ethereum.Event): string {
   return event.block.number
@@ -42,7 +43,7 @@ export function initRootDomain(): Domain {
 }
 
 export function fetchTokenId(token: BigInt): Bytes {
-  return Bytes.fromUint8Array(token);
+  return integer.toBytes(token);
 }
 
 // function toBytes(value: BigInt): Bytes {
