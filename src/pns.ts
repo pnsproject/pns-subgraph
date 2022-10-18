@@ -1,4 +1,4 @@
-import { ByteArray, crypto, Bytes } from "@graphprotocol/graph-ts";
+import { crypto, Bytes, ByteArray } from "@graphprotocol/graph-ts";
 
 import {
   Approval as ApprovalEvent,
@@ -9,8 +9,9 @@ import {
   SetName as SetNameEvent,
   SetNftName as SetNftNameEvent,
   NewSubdomain as NewSubdomainEvent,
-} from "./types/PNS4-26/PNS";
-import { SetLink as SetLinkEvent } from "./types/PNS10-16/PNS";
+  SetLink as SetLinkEvent,
+} from "./types/PNS10-16/PNS";
+
 import {
   Account,
   Transfer,
@@ -29,27 +30,28 @@ import {
   createEventID,
   defaultDomain,
   EMPTY_ADDRESS,
+  fetchTokenId,
   initRootDomain,
   ROOT_TOKEN_ID,
 } from "./utils";
 
 export function handleTransfer(event: TransferEvent): void {
-  let node = event.params.tokenId.toHexString();
+  let node = event.params.tokenId;
 
-  let fromAccount = new Account(event.params.to.toHexString());
+  let fromAccount = new Account(event.params.to);
   fromAccount.save();
 
-  let toAccount = new Account(event.params.to.toHexString());
+  let toAccount = new Account(event.params.to);
   toAccount.save();
 
   // Update the domain owner
-  let domain = Domain.load(node);
+  let domain = Domain.load(fetchTokenId(node));
 
   if (domain === null) {
-    domain = defaultDomain(node, event.block.timestamp);
+    domain = defaultDomain(fetchTokenId(node), event.block.timestamp);
   }
 
-  domain.owner = event.params.from.toHexString();
+  domain.owner = toAccount.id;
 
   domain.save();
 
@@ -57,17 +59,17 @@ export function handleTransfer(event: TransferEvent): void {
   domainEvent.blockNumber = event.block.number.toI32();
   domainEvent.transactionID = event.transaction.hash;
   domainEvent.triggeredDate = event.block.timestamp;
-  domainEvent.domain = node;
-  domainEvent.from = event.params.from.toHexString();
-  domainEvent.to = event.params.to.toHexString();
+  domainEvent.domain = fetchTokenId(node);
+  domainEvent.from = event.params.from;
+  domainEvent.to = event.params.to;
   domainEvent.save();
 }
 
 export function handleNewSubdomain(event: NewSubdomainEvent): void {
-  let subnode = event.params.subtokenId.toHexString();
-  let parentNode = event.params.tokenId.toHexString();
+  let subnode = fetchTokenId(event.params.subtokenId);
+  let parentNode = fetchTokenId(event.params.tokenId);
 
-  let account = new Account(event.params.to.toHexString());
+  let account = new Account(event.params.to);
   account.save();
 
   let domain = Domain.load(subnode);
@@ -112,8 +114,8 @@ export function handleNewSubdomain(event: NewSubdomainEvent): void {
     }
   }
 
-  domain.owner = event.params.to.toHexString();
-  domain.parent = event.params.tokenId.toHexString();
+  domain.owner = event.params.to;
+  domain.parent = fetchTokenId(event.params.tokenId);
   domain.labelName = event.params.name;
   domain.labelhash = Bytes.fromByteArray(
     crypto.keccak256(ByteArray.fromUTF8(event.params.name))
@@ -126,7 +128,7 @@ export function handleNewSubdomain(event: NewSubdomainEvent): void {
   domainEvent.triggeredDate = event.block.timestamp;
   domainEvent.domain = subnode;
   domainEvent.parentId = parentNode;
-  domainEvent.to = event.params.to.toHexString();
+  domainEvent.to = event.params.to;
   domainEvent.name = event.params.name;
   domainEvent.save();
 }
@@ -136,9 +138,9 @@ export function handleNewResolver(event: NewResolverEvent): void {
   let id = event.params.resolver
     .toHexString()
     .concat("-")
-    .concat(event.params.tokenId.toHexString());
+    .concat(fetchTokenId(event.params.tokenId).toHex());
 
-  let node = event.params.tokenId.toHexString();
+  let node = fetchTokenId(event.params.tokenId);
   let domain = Domain.load(node);
   if (domain === null) {
     if (node == ROOT_TOKEN_ID) {
@@ -153,7 +155,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
   let resolver = Resolver.load(id);
   if (resolver == null) {
     resolver = new Resolver(id);
-    resolver.domain = event.params.tokenId.toHexString();
+    resolver.domain = fetchTokenId(event.params.tokenId);
     resolver.address = event.params.resolver;
     resolver.save();
   } else {
@@ -171,44 +173,44 @@ export function handleNewResolver(event: NewResolverEvent): void {
 }
 
 export function handleApproval(event: ApprovalEvent): void {
-  let node = event.params.tokenId.toHexString();
+  let node = fetchTokenId(event.params.tokenId);
 
-  let owner = new Account(event.params.owner.toHexString());
+  let owner = new Account(event.params.owner);
   owner.save();
 
-  let approved = new Account(event.params.approved.toHexString());
+  let approved = new Account(event.params.approved);
   approved.save();
 
   let approval = new Approval(createEventID(event));
   approval.blockNumber = event.block.number.toI32();
   approval.transactionID = event.transaction.hash;
   approval.triggeredDate = event.block.timestamp;
-  approval.account = event.params.owner.toHexString();
-  approval.operator = event.params.approved.toHexString();
-  approval.tokens = event.params.tokenId.toHexString();
+  approval.account = event.params.owner;
+  approval.operator = event.params.approved;
+  approval.tokens = fetchTokenId(event.params.tokenId);
   approval.save();
 }
 
 export function handleApprovalForAll(event: ApprovalForAllEvent): void {
-  let owner = new Account(event.params.owner.toHexString());
+  let owner = new Account(event.params.owner);
   owner.save();
 
-  let operator = new Account(event.params.operator.toHexString());
+  let operator = new Account(event.params.operator);
   operator.save();
 
   let approvalForAll = new AuthorisationChanged(createEventID(event));
   approvalForAll.blockNumber = event.block.number.toI32();
   approvalForAll.transactionID = event.transaction.hash;
   approvalForAll.triggeredDate = event.block.timestamp;
-  approvalForAll.owner = event.params.owner.toHexString();
-  approvalForAll.target = event.params.operator.toHexString();
+  approvalForAll.owner = event.params.owner;
+  approvalForAll.target = event.params.operator;
   approvalForAll.isAuthorized = event.params.approved;
 
   approvalForAll.save();
 }
 
 export function handleSet(event: SetEvent): void {
-  let node = event.params.tokenId.toHexString();
+  let node = fetchTokenId(event.params.tokenId);
 
   let setEvent = new Set(createEventID(event));
   setEvent.blockNumber = event.block.number.toI32();
@@ -221,34 +223,34 @@ export function handleSet(event: SetEvent): void {
 }
 
 export function handleSetName(event: SetNameEvent): void {
-  let account = new Account(event.params.addr.toHexString());
+  let account = new Account(event.params.addr);
   account.save();
 
   let setNameEvent = new SetName(createEventID(event));
   setNameEvent.blockNumber = event.block.number.toI32();
   setNameEvent.transactionID = event.transaction.hash;
   setNameEvent.triggeredDate = event.block.timestamp;
-  setNameEvent.tokenId = event.params.tokenId.toHexString();
-  setNameEvent.account = event.params.addr.toHexString();
+  setNameEvent.tokenId = fetchTokenId(event.params.tokenId);
+  setNameEvent.account = event.params.addr;
 
   setNameEvent.save();
 }
 
 export function handleSetNftName(event: SetNftNameEvent): void {
-  let node = event.params.tokenId.toHexString();
+  let node = fetchTokenId(event.params.tokenId);
 
   let setEvent = new SetNftName(createEventID(event));
   setEvent.blockNumber = event.block.number.toI32();
   setEvent.transactionID = event.transaction.hash;
   setEvent.triggeredDate = event.block.timestamp;
   setEvent.domain = node;
-  setEvent.nftAddr = event.params.nftAddr.toHexString();
+  setEvent.nftAddr = event.params.nftAddr;
   setEvent.nftTokenId = event.params.nftTokenId;
   setEvent.save();
 }
 
 export function handleSetLink(event: SetLinkEvent): void {
-  let node = event.params.tokenId.toHexString();
+  let node = fetchTokenId(event.params.tokenId);
 
   let setEvent = new SetLink(createEventID(event));
   setEvent.blockNumber = event.block.number.toI32();

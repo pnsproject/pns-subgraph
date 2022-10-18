@@ -7,6 +7,7 @@ import {
 import {
   createEventID,
   defaultDomain,
+  fetchTokenId,
   initRootDomain,
   ROOT_TOKEN_ID,
 } from "./utils";
@@ -19,10 +20,10 @@ import {
   PriceChanged,
   Registration,
 } from "./types/schema";
-import { log } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
 
 export function handleCapacityUpdated(event: CapacityUpdatedEvent): void {
-  let tokenId = event.params.tokenId.toHexString();
+  let tokenId = fetchTokenId(event.params.tokenId);
   let domain = Domain.load(tokenId);
   if (domain === null && tokenId === ROOT_TOKEN_ID) {
     domain = initRootDomain();
@@ -42,18 +43,18 @@ export function handleCapacityUpdated(event: CapacityUpdatedEvent): void {
   registrationEvent.blockNumber = event.block.number.toI32();
   registrationEvent.transactionID = event.transaction.hash;
   registrationEvent.triggeredDate = event.block.timestamp;
-  registrationEvent.registrant = event.transaction.from.toHexString();
+  registrationEvent.registrant = event.transaction.from;
   registrationEvent.capacity = event.params.capacity;
   registrationEvent.domain = domain.id;
   registrationEvent.save();
 }
 
 export function handleNameRegistered(event: NameRegisteredEvent): void {
-  let account = new Account(event.params.to.toHex());
+  let account = new Account(event.params.to);
   account.save();
-
-  let registration = new Registration(event.params.node.toHexString());
-  registration.domain = event.params.node.toHexString();
+  let node = fetchTokenId(event.params.node);
+  let registration = new Registration(node);
+  registration.domain = registration.id;
   registration.expiryDate = event.params.expires;
 
   let labelName = event.params.name;
@@ -67,7 +68,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   registrationEvent.blockNumber = event.block.number.toI32();
   registrationEvent.transactionID = event.transaction.hash;
   registrationEvent.triggeredDate = event.block.timestamp;
-  let registrant = new Account(event.transaction.from.toHex());
+  let registrant = new Account(event.transaction.from);
   registrant.save();
   registrationEvent.registrant = registrant.id;
   registrationEvent.expiryDate = event.params.expires;
@@ -76,7 +77,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
 }
 
 export function handleNameRenewed(event: NameRenewedEvent): void {
-  let registration = Registration.load(event.params.node.toHexString())!;
+  let registration = Registration.load(fetchTokenId(event.params.node))!;
   registration.expiryDate = event.params.expires;
   registration.save();
 
@@ -85,7 +86,7 @@ export function handleNameRenewed(event: NameRenewedEvent): void {
   registrationEvent.blockNumber = event.block.number.toI32();
   registrationEvent.transactionID = event.transaction.hash;
   registrationEvent.triggeredDate = event.block.timestamp;
-  let registrant = new Account(event.transaction.from.toHex());
+  let registrant = new Account(event.transaction.from);
   registrant.save();
   registrationEvent.registrant = registrant.id;
   registrationEvent.expiryDate = event.params.expires;

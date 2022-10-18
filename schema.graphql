@@ -1,5 +1,5 @@
 type Domain @entity {
-  id: ID!                                               # The namehash of the name
+  id: Bytes!                                               # The namehash of the name
   name: String                                          # The human readable name, if known. Unknown portions replaced with hash in square brackets (eg, foo.[1234].eth)
   labelName: String                                     # The human readable label name (imported from CSV), if known
   labelhash: Bytes                                      # keccak256(labelName)
@@ -83,7 +83,7 @@ type NewResolver implements DomainEvent @entity {
 
 
 type Account @entity {
-  id: ID!
+  id: Bytes!
   domains: [Domain!]! @derivedFrom(field: "owner")
   authorities: [AuthorisationChanged!] @derivedFrom(field: "owner")
   authoriseds: [AuthorisationChanged!] @derivedFrom(field: "target")
@@ -119,7 +119,7 @@ type Approval implements AccountEvent @entity {
 }
 
 type Registration @entity {
-  id: ID!
+  id: Bytes!
   domain: Domain
   origin: Domain
   expiryDate: BigInt!
