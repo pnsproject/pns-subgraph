@@ -1,5 +1,5 @@
 // Import types and APIs from graph-ts
-import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, ByteArray, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { Domain } from "./types/schema";
 
 export function createEventID(event: ethereum.Event): string {
@@ -36,5 +36,5 @@ export function initRootDomain(): Domain {
 }
 
 export function fetchTokenId(token: BigInt): Bytes {
-  return Bytes.fromBigInt(token) as Bytes;
+  return Bytes.fromByteArray(ByteArray.fromBigInt(token));
 }
