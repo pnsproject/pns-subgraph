@@ -36,5 +36,5 @@ export function initRootDomain(): Domain {
 }
 
 export function fetchTokenId(token: BigInt): Bytes {
-  return Bytes.fromByteArray(Bytes.fromBigInt(token));
+  return Bytes.fromBigInt(token) as Bytes;
 }
