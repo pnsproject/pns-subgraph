@@ -11,6 +11,7 @@ type Domain @entity {
   resolver: Resolver
   createdAt: BigInt!
   events: [DomainEvent!] @derivedFrom(field: "domain")
+  registrations: [Registration!] @derivedFrom(field: "domain")
 }
 
 interface DomainEvent {
