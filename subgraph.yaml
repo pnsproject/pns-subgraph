@@ -7,6 +7,35 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
+    name: Controller10-24
+    network: moonbeam
+    source:
+      address: '0x4B332f38E0484078CD1368144A776482244663CE'
+      abi: Controller
+      startBlock: 2090608
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/controller.ts
+      entities:
+        - Domain
+        - Account
+        - Registration
+        - PriceChanged
+      abis:
+        - name: Controller
+          file: ./abis/Controller10-16.json
+      eventHandlers:
+        - event: CapacityUpdated(uint256,uint256)
+          handler: handleCapacityUpdated
+        - event: NameRegistered(address,uint256,uint256,uint256,string)
+          handler: handleNameRegistered
+        - event: NameRenewed(uint256,uint256,uint256,string)
+          handler: handleNameRenewed
+        - event: PriceChanged(uint256[],uint256[])
+          handler: handlePriceChanged
+  - kind: ethereum/contract
     name: Controller10-16
     network: moonbeam
     source:
