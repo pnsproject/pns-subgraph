@@ -121,9 +121,9 @@ type Approval implements AccountEvent @entity {
 
 type Registration @entity {
   id: Bytes!
-  domain: Domain
+  domain: Domain!
   origin: Domain
-  expiryDate: BigInt!
+  expiryDate: BigInt
   capacity: BigInt
   labelName: String
   events: [RegistrationEvent!]! @derivedFrom(field: "registration")

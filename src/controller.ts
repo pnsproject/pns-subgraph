@@ -7,6 +7,7 @@ import {
 import {
   createEventID,
   defaultDomain,
+  fetchRegistrationWithoutSave,
   fetchTokenId,
   initRootDomain,
   ROOT_TOKEN_ID,
@@ -33,7 +34,7 @@ export function handleCapacityUpdated(event: CapacityUpdatedEvent): void {
   }
   domain.save();
 
-  let registration = Registration.load(tokenId)!;
+  let registration = fetchRegistrationWithoutSave(tokenId);
 
   registration.capacity = event.params.capacity;
   registration.save();
@@ -53,8 +54,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   let account = new Account(event.params.to);
   account.save();
   let node = fetchTokenId(event.params.node);
-  let registration = new Registration(node);
-  registration.domain = registration.id;
+  let registration = fetchRegistrationWithoutSave(node);
   registration.expiryDate = event.params.expires;
 
   let labelName = event.params.name;
@@ -78,7 +78,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
 
 export function handleNameRenewed(event: NameRenewedEvent): void {
   let node = fetchTokenId(event.params.node);
-  let registration = new Registration(node);
+  let registration = fetchRegistrationWithoutSave(node);
   registration.expiryDate = event.params.expires;
   registration.save();
 

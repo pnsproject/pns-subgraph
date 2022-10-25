@@ -7,7 +7,7 @@ import {
   // crypto,
   log,
 } from "@graphprotocol/graph-ts";
-import { Domain } from "./types/schema";
+import { Domain, Registration } from "./types/schema";
 
 export function createEventID(event: ethereum.Event): string {
   return event.block.number
@@ -49,6 +49,17 @@ export function fetchTokenId(token: BigInt): Bytes {
     return Bytes.fromHexString("0x" + "0".repeat(zeros) + hex.slice(2));
   }
   return Bytes.fromHexString(hex);
+}
+
+export function fetchRegistration(token: Bytes): Registration {
+  let registration = fetchRegistrationWithoutSave(token);
+  registration.save();
+  return registration;
+}
+export function fetchRegistrationWithoutSave(token: Bytes): Registration {
+  let registration = new Registration(token);
+  registration.domain = registration.id;
+  return registration;
 }
 
 // function toBytes(value: BigInt): Bytes {
