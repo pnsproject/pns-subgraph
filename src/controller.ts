@@ -77,7 +77,8 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
 }
 
 export function handleNameRenewed(event: NameRenewedEvent): void {
-  let registration = Registration.load(fetchTokenId(event.params.node))!;
+  let node = fetchTokenId(event.params.node);
+  let registration = new Registration(node);
   registration.expiryDate = event.params.expires;
   registration.save();
 
