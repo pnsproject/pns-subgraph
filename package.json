@@ -7,7 +7,7 @@
     "codegen": "graph codegen --output-dir src/types/",
     "setup": "yarn codegen && yarn create-local && yarn deploy-local",
     "create-local": "graph create graphprotocol/pns --node http://127.0.0.1:9020",
-    "deploy-local": "graph deploy graphprotocol/pns --ipfs http://ipfsnode.raindrop.link:28080 --node http://127.0.0.1:9020/ --version-label 0.0.1",
+    "deploy-local": "graph deploy graphprotocol/pns --ipfs http://ipfsnode.raindrop.link:25001 --node http://127.0.0.1:9020/ --version-label 0.0.1",
     "remove-local": "graph remove graphprotocol/pns --node http://127.0.0.1:9020",
     "build": "graph build",
     "watch-local": "graph deploy graphprotocol/pns --watch --node http://127.0.0.1:9020/ --ipfs http://ipfsnode.raindrop.link:28080"
