@@ -106,9 +106,9 @@ export function handleNewSubdomain(event: NewSubdomainEvent): void {
     }
 
     if (parent != null && parent.name != null) {
-      domain.name = domain.labelName + "." + parent.name!;
+      domain.name = domain.labelName!.toString() + "." + parent.name!;
     } else {
-      domain.name = domain.labelName + ".dot";
+      domain.name = domain.labelName!.toString() + ".dot";
     }
   }
 
@@ -116,7 +116,7 @@ export function handleNewSubdomain(event: NewSubdomainEvent): void {
   domain.parent = event.params.tokenId.toHexString();
   domain.labelName = event.params.name;
   domain.labelhash = Bytes.fromByteArray(
-    crypto.keccak256(ByteArray.fromUTF8(event.params.name))
+    crypto.keccak256(ByteArray.fromUTF8(event.params.name)),
   );
   domain.save();
 

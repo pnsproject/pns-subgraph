@@ -1,19 +1,24 @@
 {
   "name": "pns-subgraph",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "repository": "https://github.com/ensdomains/ens-subgraph",
   "license": "MIT",
   "scripts": {
-    "codegen": "graph codegen --output-dir src/types/",
-    "setup": "yarn codegen && yarn create-local && yarn deploy-local",
-    "create-local": "graph create graphprotocol/pns --node http://127.0.0.1:9020",
-    "deploy-local": "graph deploy graphprotocol/pns --ipfs http://localhost:5001 --node http://127.0.0.1:9020/ --version-label 0.0.1",
-    "remove-local": "graph remove graphprotocol/pns --node http://127.0.0.1:9020",
-    "build": "graph build",
-    "watch-local": "graph deploy graphprotocol/pns --watch --node http://127.0.0.1:9020/ --ipfs http://localhost:5001"
+    "codegen": "bun x graph codegen --output-dir src/types/",
+    "setup": "bun x graph codegen && bun run create-local && bun run deploy-local",
+    "create-local": "bun x graph create graphprotocol/pns --node http://127.0.0.1:9020",
+    "deploy-local": "bun x graph deploy graphprotocol/pns --ipfs http://localhost:5001 --node http://127.0.0.1:9020/ --version-label 0.1.0",
+    "remove-local": "bun x graph remove graphprotocol/pns --node http://127.0.0.1:9020",
+    "build": "bun x graph build",
+    "watch-local": "bun x graph deploy graphprotocol/pns --watch --node http://127.0.0.1:9020/ --ipfs http://localhost:5001"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-ts": "^0.37.0"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.34.0",
-    "@graphprotocol/graph-ts": "^0.28.0"
+    "@graphprotocol/graph-cli": "^0.93.3"
+  },
+  "resolutions": {
+    "@types/node": "12.20.55"
   }
 }

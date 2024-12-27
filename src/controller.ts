@@ -19,7 +19,6 @@ import {
   PriceChanged,
   Registration,
 } from "./types/schema";
-import { log } from "@graphprotocol/graph-ts";
 
 export function handleCapacityUpdated(event: CapacityUpdatedEvent): void {
   let tokenId = event.params.tokenId.toHexString();
