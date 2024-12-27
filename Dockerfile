@@ -23,6 +23,7 @@ COPY . .
 
 # 运行构建（需要 devDependencies）
 ENV NODE_ENV=production
+RUN bun run codegen
 RUN bun run build
 
 # 复制生产依赖项和构建后的代码到最终镜像

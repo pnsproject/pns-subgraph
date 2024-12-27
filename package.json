@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "codegen": "bun x graph codegen --output-dir src/types/",
-    "setup": "bun x graph codegen && bun run create-local && bun run deploy-local",
+    "setup": "bun run create-local && bun run deploy-local",
     "create-local": "bun x graph create graphprotocol/pns --node http://127.0.0.1:9020",
     "deploy-local": "bun x graph deploy graphprotocol/pns --ipfs http://localhost:5001 --node http://127.0.0.1:9020/ --version-label 0.1.0",
     "remove-local": "bun x graph remove graphprotocol/pns --node http://127.0.0.1:9020",
