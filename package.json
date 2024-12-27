@@ -12,7 +12,7 @@
     "build": "bun x graph build",
     "watch-local": "bun x graph deploy graphprotocol/pns --watch --node http://127.0.0.1:9020/ --ipfs http://localhost:5001"
   },
-  "devDependencies": {
+  "dependencies": {
     "@graphprotocol/graph-ts": "^0.37.0",
     "@graphprotocol/graph-cli": "^0.93.3"
   }
