@@ -25,7 +25,7 @@ RUN bun run build
 
 # 复制生产依赖项和构建后的代码到最终镜像
 FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=install /temp/prod/node_modules ./node_modules
 COPY --from=prerelease /usr/src/app/build ./build
 COPY --from=prerelease /usr/src/app/package.json .
 COPY subgraph.yaml ./subgraph.yaml
